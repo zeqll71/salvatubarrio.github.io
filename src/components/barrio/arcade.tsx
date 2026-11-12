@@ -505,7 +505,7 @@ export function ArcadeScreen({
       {over && (
         <div className={over.isRecord ? "modal finale flood arcade-ui record-finale" : "modal finale flood arcade-ui"}>
           <div className="dialog sky-over-dialog">
-            {over.isRecord ? <><p className="kicker">ARCADE · SKY JUMP</p><h2 className="record-title">¡NUEVO RÉCORD!</h2><p>¡Bien ahí, {name}! Llegaste más alto que nunca.</p></> : <><p className="kicker">ARCADE · SKY JUMP</p><h2>{over.cause === "glass" ? "¡Cuidado con los vidrios!" : "La inundación te alcanzó"}</h2><p>{over.cause === "glass" ? "El Sol de Mayo no llegó a protegerte esta vez." : "La tormenta porteña ganó esta ronda. ¡Probá subir más rápido!"}</p></>}
+            {over.isRecord ? <><p className="kicker">ARCADE · SKY JUMP</p><h2 className="record-title">¡NUEVO RÉCORD!</h2><p>¡Bien ahí, {name}! Llegaste más alto que nunca.</p></> : <><p className="kicker">ARCADE · SKY JUMP</p><h2>{over.cause === "glass" ? "¡Cuidado con los vidrios!" : "La inundación te alcanzó"}</h2><p>{over.cause === "glass" ? "El Sol de Mayo no llegó a protegerte esta vez." : "La tormenta ganó esta ronda. ¡Probá subir más rápido!"}</p></>}
             <ul className="arcade-stats">
               <li><span>Puntuación</span><b>{over.score}</b></li>
               <li><span>Zona</span><b>{skyZone(over.score).label}</b></li>
