@@ -496,7 +496,7 @@ export function ArcadeScreen({
           <div className="dialog">
             <p className="kicker">Arcade · Sky Jump</p>
             <h2 id="arcade-pause-title">Partida en pausa</h2>
-            <p>La tormenta y el agua esperan mientras descansás.</p>
+            <p>La partida está pausada. Continuá cuando quieras.</p>
             <div className="arcade-pause-actions">
               <button className="tap" type="button" onClick={() => setPauseMenu(false)}><Play size={16} /> Reanudar</button>
               <button className="tap alt" type="button" onClick={startGame}><RotateCcw size={16} /> Reiniciar</button>
@@ -526,24 +526,11 @@ export function ArcadeScreen({
       {over && (
         <div className={over.isRecord ? "modal finale flood arcade-ui record-finale" : "modal finale flood arcade-ui"}>
           <div className="dialog sky-over-dialog">
-            {over.isRecord ? <><p className="kicker">ARCADE · SKY JUMP</p><h2 className="record-title">¡NUEVO RÉCORD!</h2><p>¡Bien ahí, {name}! Llegaste más alto que nunca.</p></> : <><p className="kicker">ARCADE · SKY JUMP</p><h2>{over.cause === "fire" ? "¡Cuidado con el fuego!" : over.cause === "fall" ? "¡Te caíste de la pantalla!" : "La inundación te alcanzó"}</h2><p>{over.cause === "fire" ? "El Sol de Mayo no llegó a protegerte de las llamas." : over.cause === "fall" ? "Te quedaste sin plataforma y caíste demasiado abajo. ¡Probá otra vez!" : "La tormenta porteña ganó esta ronda. ¡Probá subir más rápido!"}</p></>}
+            {over.isRecord ? <><p className="kicker">ARCADE · SKY JUMP</p><h2 className="record-title">¡NUEVO RÉCORD!</h2><p>¡Bien ahí, {name}! Llegaste más alto que nunca.</p></> : <><p className="kicker">ARCADE · SKY JUMP</p><h2>{over.cause === "fire" ? "¡Cuidado con el fuego!" : over.cause === "fall" ? "¡Te caíste de la pantalla!" : "La inundación te alcanzó"}</h2><p>{over.cause === "fire" ? "El Sol de Mayo no llegó a protegerte de las llamas." : over.cause === "fall" ? "Te quedaste sin plataforma y caíste demasiado abajo. ¡Probá otra vez!" : "El agua te alcanzó. ¡Intentá llegar más alto!"}</p></>}
             <ul className="arcade-stats">
               <li><span>Puntuación</span><b>{over.score}</b></li>
               <li><span>Zona</span><b>{skyZone(over.score).label}</b></li>
               <li><span>Récord personal</span><b>{over.best}</b></li>
               <li><span>Tiempo</span><b>{formatTime(over.time)}</b></li>
             </ul>
-            {over.pending && <p>Guardando tu puesto en el ranking…</p>}
-            {over.failed && <p className="err">No se pudo guardar el ranking.</p>}
-            {!over.pending && !over.failed && over.rank > 0 && <p>Puesto #{over.rank} en el ranking.</p>}
-            {!over.pending && <ArcadeRankList rows={ranking} me={name} mine={over.rank > 0 ? { place: over.rank, name, score: over.best } : null} compact />}
-            <div className="actions">
-              <button className="tap" type="button" onClick={startGame}><RotateCcw size={16} /> Jugar de nuevo</button>
-              <button className="tap alt" type="button" onClick={onMenu}>Menú</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+         
