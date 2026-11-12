@@ -533,4 +533,18 @@ export function ArcadeScreen({
               <li><span>Récord personal</span><b>{over.best}</b></li>
               <li><span>Tiempo</span><b>{formatTime(over.time)}</b></li>
             </ul>
+            <div className="arcade-over-actions">
+              <button className="tap" type="button" onClick={startGame}>
+                <RotateCcw size={16} /> Jugar otra vez
+              </button>
+              <button className="tap alt" type="button" onClick={onLeave}>
+                Volver al menú principal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
          
