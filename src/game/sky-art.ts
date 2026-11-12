@@ -686,4 +686,308 @@ function paintFarCity() {
   ctx.fillRect(236, 18, 8, 78);
   ctx.fillRect(238, 8, 4, 12);
   ctx.fillStyle = STONE;
-  c
+   ctx.fillRect(232, 94, 16, 5);
+  ctx.fillStyle = STEEL;
+  ctx.fillRect(74, 70, 28, 16);
+  ctx.fillRect(80, 62, 16, 10);
+  ctx.fillRect(86, 56, 5, 8);
+  return ctx.canvas;
+}
+
+function paintNearCity() {
+  const ctx = make(W, 200, true);
+  ctx.fillStyle = SLATE;
+  ctx.fillRect(0, 48, 78, 100);
+  ctx.fillRect(86, 28, 58, 120);
+  ctx.fillRect(152, 62, 70, 86);
+  ctx.fillRect(230, 36, 90, 112);
+  ctx.fillStyle = DEEP;
+  ctx.fillRect(0, 48, 78, 6);
+  ctx.fillRect(86, 28, 58, 6);
+  ctx.fillRect(230, 36, 90, 6);
+  for (let wx = 8; wx < 70; wx += 14) {
+    ctx.fillStyle = GOLD2;
+    ctx.fillRect(wx, 66, 6, 8);
+    ctx.fillStyle = "#1c3044";
+    ctx.fillRect(wx, 82, 6, 8);
+  }
+  ctx.fillStyle = INK;
+  ctx.fillRect(168, 36, 18, 28);
+  ctx.fillStyle = RED;
+  ctx.fillRect(166, 32, 22, 6);
+  ctx.fillStyle = TANQUE;
+  ctx.fillRect(170, 40, 14, 16);
+  ctx.fillStyle = SLATE;
+  ctx.fillRect(170, 54, 3, 8);
+  ctx.fillRect(181, 54, 3, 8);
+  ctx.fillStyle = WATER;
+  ctx.fillRect(0, 132, W, 68);
+  ctx.fillStyle = WATER2;
+  ctx.fillRect(0, 156, W, 44);
+  ctx.fillStyle = FOAM;
+  for (let x = 0; x < W; x += 10) ctx.fillRect(x, 130 + (x % 20 === 0 ? 0 : 2), 6, 2);
+  ctx.fillStyle = CREAM;
+  ctx.fillRect(18, 114, 84, 30);
+  ctx.fillStyle = RED;
+  ctx.fillRect(18, 126, 84, 4);
+  ctx.fillStyle = CELESTE2;
+  ctx.fillRect(26, 118, 10, 7);
+  ctx.fillRect(42, 118, 10, 7);
+  ctx.fillRect(58, 118, 10, 7);
+  ctx.fillRect(74, 118, 10, 7);
+  ctx.fillStyle = INK;
+  ctx.fillRect(28, 138, 8, 5);
+  ctx.fillRect(78, 138, 8, 5);
+  ctx.fillStyle = GOLD;
+  ctx.fillRect(196, 118, 52, 20);
+  ctx.fillStyle = INK;
+  ctx.fillRect(206, 112, 16, 6);
+  ctx.fillStyle = WHITE;
+  ctx.fillRect(208, 113, 12, 4);
+  for (let x = 198; x < 244; x += 4) {
+    ctx.fillStyle = ((x / 4) | 0) % 2 ? INK : WHITE;
+    ctx.fillRect(x, 132, 4, 3);
+  }
+  return ctx.canvas;
+}
+
+function paintCloud(dark: boolean) {
+  const ctx = make(74, 30, true);
+  ctx.fillStyle = dark ? "#1b2433" : WHITE;
+  ctx.fillRect(8, 14, 58, 12);
+  ctx.fillRect(16, 8, 38, 16);
+  ctx.fillRect(28, 3, 22, 12);
+  ctx.fillStyle = dark ? "#314056" : "#d5e2ee";
+  ctx.fillRect(20, 12, 30, 8);
+  return ctx.canvas;
+}
+
+function paintRain() {
+  const ctx = make(W, H, true);
+  for (let i = 0; i < 70; i++) {
+    const x = (i * 47) % W;
+    const y = (i * 83) % H;
+    ctx.fillStyle = i % 3 === 0 ? WHITE : FOAM;
+    ctx.fillRect(x, y, 2, 3);
+    ctx.fillRect(x - 2, y + 3, 2, 3);
+    ctx.fillRect(x - 4, y + 6, 2, 3);
+  }
+  return ctx.canvas;
+}
+
+function paintWater() {
+  const ctx = make(W, H, false);
+  const gradient = ctx.createLinearGradient(0, 0, 0, H);
+  gradient.addColorStop(0, "#5ec4d4");
+  gradient.addColorStop(0.18, "#1d7ea4");
+  gradient.addColorStop(1, "#0e3458");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, W, H);
+  return ctx.canvas;
+}
+
+function paintDebris() {
+  const ctx = make(W, 20, true);
+  ctx.fillStyle = BRICK;
+  ctx.fillRect(16, 6, 28, 5);
+  ctx.fillStyle = GOLD2;
+  ctx.fillRect(18, 7, 24, 2);
+  ctx.fillStyle = INK;
+  ctx.fillRect(150, 4, 14, 12);
+  ctx.fillStyle = STEEL;
+  ctx.fillRect(154, 7, 6, 6);
+  ctx.fillStyle = GREEN;
+  ctx.fillRect(240, 8, 6, 8);
+  ctx.fillStyle = CELESTE;
+  ctx.fillRect(246, 6, 8, 10);
+  return ctx.canvas;
+}
+
+function paintBolt() {
+  const ctx = make(18, 150, true);
+  let x = 6;
+  for (let y = 0; y < 140; y += 8) {
+    ctx.fillStyle = YELLOW2;
+    ctx.fillRect(x, y, 4, 10);
+    ctx.fillStyle = WHITE;
+    ctx.fillRect(x + 1, y, 2, 10);
+    x += (y / 8) % 2 === 0 ? 4 : -4;
+    if (x < 1) x = 1;
+    if (x > 10) x = 8;
+  }
+  return ctx.canvas;
+}
+
+function build(): SkyArt {
+  return {
+    skies: paintSkies(),
+    farCity: paintFarCity(),
+    nearCity: paintNearCity(),
+    cloudDark: paintCloud(true),
+    cloudLite: paintCloud(false),
+    rain: paintRain(),
+    water: paintWater(),
+    wave: paintWave(),
+    debris: paintDebris(),
+    bolt: paintBolt(),
+    balloon: paintBalloon(),
+    sun: paintSun(),
+    stand: heroFrom(KID_STAND),
+    walk: heroFrom(KID_WALK),
+    jump: heroFrom(KID_JUMP),
+    superStand: heroFrom(SUPER_STAND),
+    superWalk: heroFrom(SUPER_WALK),
+    superJump: heroFrom(SUPER_JUMP),
+    platforms: bakePlatforms(),
+  };
+}
+
+function paintWave() {
+  const ctx = make(W, 8, true);
+  ctx.fillStyle = FOAM;
+  for (let x = 0; x < W; x += 8) ctx.fillRect(x, x % 16 === 0 ? 1 : 3, 5, 2);
+  ctx.fillStyle = CELESTE;
+  for (let x = 4; x < W; x += 12) ctx.fillRect(x, 5, 3, 2);
+  return ctx.canvas;
+}
+
+function skyArt() {
+  if (!cached) cached = build();
+  return cached;
+}
+
+const ZONE_MARKS = [0, 180, 420, 780, 1200];
+
+export function drawSkyBackdrop(ctx: CanvasRenderingContext2D, altitude: number, time: number) {
+  const art = skyArt();
+  let band = 0;
+  while (band < ZONE_MARKS.length - 1 && altitude >= ZONE_MARKS[band + 1]!) band++;
+  ctx.drawImage(art.skies[band]!, 0, 0);
+  if (band < ZONE_MARKS.length - 1) {
+    const span = ZONE_MARKS[band + 1]! - ZONE_MARKS[band]!;
+    const mix = (altitude - ZONE_MARKS[band]!) / span;
+    if (mix > 0) {
+      ctx.globalAlpha = mix;
+      ctx.drawImage(art.skies[band + 1]!, 0, 0);
+      ctx.globalAlpha = 1;
+    }
+  }
+  const cityAlpha = altitude >= 980 ? 0 : 1 - altitude / 980;
+  if (cityAlpha > 0.03) {
+    ctx.globalAlpha = cityAlpha;
+    ctx.drawImage(art.farCity, 0, (146 + Math.min(300, altitude * 0.16)) | 0);
+    ctx.drawImage(art.nearCity, 0, (196 + Math.min(360, altitude * 0.28)) | 0);
+    ctx.globalAlpha = 1;
+  }
+  const cloudAlpha = altitude >= 1100 ? 0 : 0.95 * (1 - altitude / 1100);
+  if (cloudAlpha > 0.03) {
+    ctx.globalAlpha = cloudAlpha;
+    const storm = altitude < 420;
+    const cloud = storm ? art.cloudDark : art.cloudLite;
+    const drift = Math.floor(time * (storm ? 26 : 12));
+    const base = storm ? 16 : 34;
+    for (let i = 0; i < 4; i++) {
+      const span = W + 120;
+      const x = ((((i * 98 - drift) % span) + span) % span) - 80;
+      const y = base + (i % 2) * 30 - Math.min(70, altitude * 0.035);
+      ctx.drawImage(cloud, x | 0, y | 0);
+    }
+    ctx.globalAlpha = 1;
+  }
+}
+
+export function drawSkyPlatform(ctx: CanvasRenderingContext2D, platform: SkyPlatform, sy: number, time: number) {
+  const art = skyArt();
+  const variant = platformOf(art, platform.kind, platform.width, platform.hazard);
+  const image = platform.kind === "airplane" && platform.vx < 0 ? variant.left : variant.canvas;
+  const dx = Math.round(platform.x);
+  const dy = Math.round(sy - variant.surface);
+  ctx.drawImage(image, dx, dy);
+  if (platform.kind === "airplane" && ((time * 12) | 0) & 1) {
+    ctx.fillStyle = GOLD;
+    const back = platform.vx < 0 ? dx + platform.width - 6 : dx + 2;
+    ctx.fillRect(back, Math.round(sy + 4), 3, 2);
+  }
+}
+
+export function drawSkyPickup(ctx: CanvasRenderingContext2D, pickup: SkyPickup, sy: number, time: number) {
+  const art = skyArt();
+  const bob = Math.sin(time * 4 + pickup.id) > 0 ? -2 : 1;
+  const image = pickup.kind === "balloon" ? art.balloon : art.sun;
+  ctx.drawImage(image, Math.round(pickup.x - 16), Math.round(sy - 18 + bob));
+}
+
+export function drawHijitus(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  footY: number,
+  time: number,
+  vx: number,
+  vy: number,
+  shield: boolean,
+) {
+  const art = skyArt();
+  const jumping = vy > 140 || vy < -90;
+  const step = (time * 8) | 0;
+  const frame = shield
+    ? jumping ? art.superJump : step % 2 ? art.superWalk : art.superStand
+    : jumping ? art.jump : step % 2 ? art.walk : art.stand;
+  ctx.drawImage(vx < -8 ? frame.l : frame.r, Math.round(x - 16), Math.round(footY - 32));
+}
+
+export function drawSkyFlood(ctx: CanvasRenderingContext2D, surfaceY: number, time: number) {
+  const y = Math.round(surfaceY);
+  if (y >= H) return;
+  const art = skyArt();
+  const waveX = -(((time * 36) | 0) % W);
+  const drift = -(((time * 16) | 0) % W);
+  if (y <= 0) {
+    ctx.drawImage(art.water, 0, 0);
+    ctx.drawImage(art.wave, waveX, 0);
+    ctx.drawImage(art.wave, waveX + W, 0);
+    ctx.drawImage(art.debris, drift, 16);
+    ctx.drawImage(art.debris, drift + W, 16);
+    return;
+  }
+  const height = H - y;
+  ctx.drawImage(art.water, 0, 0, W, height, 0, y, W, height);
+  ctx.drawImage(art.wave, waveX, y - 3);
+  ctx.drawImage(art.wave, waveX + W, y - 3);
+  if (y < H - 16) {
+    ctx.drawImage(art.debris, drift, y + 14);
+    ctx.drawImage(art.debris, drift + W, y + 14);
+  }
+}
+
+export function drawSkyRain(ctx: CanvasRenderingContext2D, time: number, altitude: number) {
+  const alpha = altitude <= 200 ? 0.8 : 0.8 * (1 - (altitude - 200) / 700);
+  if (alpha <= 0.03) return;
+  const art = skyArt();
+  ctx.globalAlpha = alpha;
+  const shift = Math.floor(time * 240) % H;
+  ctx.drawImage(art.rain, 0, shift);
+  ctx.drawImage(art.rain, 0, shift - H);
+  ctx.globalAlpha = 1;
+}
+
+export function drawSkyBolt(ctx: CanvasRenderingContext2D, time: number, altitude: number) {
+  if (altitude > 380) return;
+  if (time % 7.5 > 0.08) return;
+  const art = skyArt();
+  ctx.drawImage(art.bolt, (Math.floor(time / 7.5) % 2 === 0) ? 46 : 214, 0);
+}
+
+export function drawSkyPortrait(ctx: CanvasRenderingContext2D) {
+  const art = skyArt();
+  ctx.imageSmoothingEnabled = false;
+  ctx.fillStyle = "#3a4a5e";
+  ctx.fillRect(0, 0, 64, 64);
+  ctx.fillStyle = "#8d8474";
+  ctx.fillRect(0, 40, 64, 24);
+  ctx.fillStyle = SLATE;
+  ctx.fillRect(2, 16, 16, 28);
+  ctx.fillStyle = SAND;
+  ctx.fillRect(44, 6, 6, 30);
+  ctx.fillRect(42, 34, 10, 4);
+  ctx.drawImage(art.stand.r, 16, 18);
+}
