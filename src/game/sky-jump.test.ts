@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createSkyWorld, extendSkyWorld, skyScore, skyZone, updateMovingPlatforms } from "./sky-jump.ts";
+import { createSkyWorld, extendSkyWorld, hasFallenBelowScreen, skyScore, skyZone, updateMovingPlatforms } from "./sky-jump.ts";
 
-test("Sky Jump genera plataformas alcanzables y separadas", () => {
+test("Sky Jump genera plataformas más espaciadas pero alcanzables", () => {
   for (let seed = 1; seed <= 300; seed++) {
     const world = createSkyWorld(seed);
     extendSkyWorld(world, 1600);
@@ -10,11 +10,12 @@ test("Sky Jump genera plataformas alcanzables y separadas", () => {
       const a = world.platforms[i - 1]!;
       const b = world.platforms[i]!;
       const gap = b.height - a.height;
-      assert.ok(gap <= 82.1, `salto vertical imposible en seed ${seed}`);
-      assert.ok(gap >= 51, `plataformas pegadas en seed ${seed}`);
+      assert.ok(gap <= 110, `salto vertical imposible en seed ${seed}`);
+      assert.ok(gap >= 65, `plataformas demasiado pegadas en seed ${seed}`);
       const horizontalGap = Math.max(0, Math.max(a.x - (b.x + b.width), b.x - (a.x + a.width)));
       assert.ok(horizontalGap <= 92, `salto horizontal imposible en seed ${seed}`);
       assert.ok(!(a.hazard && b.hazard), `dos trampas seguidas en seed ${seed}`);
+      assert.ok(!b.hazard || b.kind === "airplane", `el fuego solo debe aparecer en aviones (seed ${seed})`);
     }
   }
 });
@@ -73,4 +74,11 @@ test("las plataformas-avión permanecen dentro del escenario", () => {
       }
     }
   }
+});
+
+
+test("la partida termina cuando Hijitus cae completamente fuera de la pantalla", () => {
+  assert.equal(hasFallenBelowScreen(511), false);
+  assert.equal(hasFallenBelowScreen(512), true);
+  assert.equal(hasFallenBelowScreen(560), true);
 });

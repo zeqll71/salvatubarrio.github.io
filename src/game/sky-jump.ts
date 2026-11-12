@@ -47,9 +47,9 @@ export const SKY_ZONES = [
   { at: 1200, id: "espacio", label: "Espacio" },
 ] as const;
 
-const GAP_PATTERN = [56, 70, 78, 62, 74, 58, 76, 66, 72, 60];
-const MIN_GAP = 52;
-const MAX_GAP = 80;
+const GAP_PATTERN = [70, 82, 90, 74, 96, 84, 100, 78, 92, 72];
+const MIN_GAP = 66;
+const MAX_GAP = 110;
 const MAX_EDGE_GAP = 86;
 const MIN_X = 8;
 const RIGHT = 312;
@@ -119,8 +119,9 @@ export function extendSkyWorld(world: SkyWorld, highestHeight: number): void {
   let previous = world.platforms[world.platforms.length - 1]!;
   while (world.nextHeight < highestHeight + 560) {
     const index = world.generated++;
+    const difficulty = Math.min(1, world.nextHeight / 1400);
     let gap = GAP_PATTERN[index % GAP_PATTERN.length]!;
-    gap += Math.round((random01(world) - 0.5) * 6);
+    gap += Math.round(difficulty * 10 + (random01(world) - 0.5) * 8);
     if (gap < MIN_GAP) gap = MIN_GAP;
     if (gap > MAX_GAP) gap = MAX_GAP;
     const height = previous.height + gap;
@@ -128,7 +129,8 @@ export function extendSkyWorld(world: SkyWorld, highestHeight: number): void {
     const choices = PLATFORM_WIDTHS[kind];
     const width = choices[Math.floor(random01(world) * choices.length)]!;
     const x = placeX(previous.x, previous.width, width, index);
-    const hazard = !previous.hazard && index > 2 && random01(world) < 0.115;
+    // El fuego aparece únicamente en algunos aviones y nunca en dos plataformas seguidas.
+    const hazard = kind === "airplane" && !previous.hazard && index > 3 && random01(world) < 0.34;
     const vx = kind === "airplane" ? (random01(world) < 0.5 ? -1 : 1) * (24 + random01(world) * 25) : 0;
     const platform: SkyPlatform = {
       id: world.nextId++,
@@ -140,7 +142,8 @@ export function extendSkyWorld(world: SkyWorld, highestHeight: number): void {
       vx,
     };
     world.platforms.push(platform);
-    if (index % 4 === 2 || random01(world) < 0.16) {
+    // Menos coleccionables para que la subida exija elegir mejor el recorrido.
+    if (index % 6 === 3 || random01(world) < 0.08) {
       world.pickups.push({
         id: world.nextId++,
         x: Math.max(14, Math.min(306, x + width / 2 + (random01(world) - 0.5) * 20)),
@@ -173,4 +176,12 @@ export function updateMovingPlatforms(world: SkyWorld, dt: number): void {
 /** Solo la altura cuenta. Quedarse quieto no suma. El bonus no entra al puntaje. */
 export function skyScore(highestHeight: number, _bonus = 0): number {
   return Math.max(0, Math.floor(highestHeight));
+}
+
+
+/** True when Hijitus has fallen completely below the visible canvas.
+ * footY is the character's bottom anchor (drawHijitus draws from footY - spriteHeight).
+ */
+export function hasFallenBelowScreen(footY: number, screenHeight = 480, spriteHeight = 32): boolean {
+  return footY - spriteHeight >= screenHeight;
 }

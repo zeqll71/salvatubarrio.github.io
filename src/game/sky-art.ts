@@ -89,8 +89,9 @@ const HIJ: Record<string, string> = {
   s: "#f3c9a2",
   e: INK,
   n: "#c47a58",
-  g: GREEN,
-  R: RED,
+  // Ropa azul petróleo con detalle amarillo para que el personaje destaque sobre la tormenta.
+  g: "#28789b",
+  R: "#f2c94c",
   b: "#3a2a22",
   Y: YELLOW,
   y: YELLOW2,
@@ -304,23 +305,45 @@ function paintSun() {
   return ctx.canvas;
 }
 
-function paintGlass(ctx: CanvasRenderingContext2D, width: number, surface: number) {
-  for (let x = 8; x < width - 8; x += 14) {
-    ctx.fillStyle = INK;
-    ctx.fillRect(x - 1, surface - 7, 6, 8);
-    ctx.fillStyle = "#bff4fb";
-    ctx.fillRect(x, surface - 6, 4, 6);
-    ctx.fillStyle = WHITE;
-    ctx.fillRect(x + 1, surface - 5, 1, 3);
+function fillPixelPolygon(ctx: CanvasRenderingContext2D, points: Array<[number, number]>, color: string) {
+  ctx.beginPath();
+  ctx.moveTo(points[0]![0], points[0]![1]);
+  for (let i = 1; i < points.length; i++) ctx.lineTo(points[i]![0], points[i]![1]);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+
+function paintFire(ctx: CanvasRenderingContext2D, width: number, surface: number) {
+  // Base oscura para separar las llamas del fuselaje del avión.
+  ctx.fillStyle = INK;
+  ctx.fillRect(7, surface - 1, width - 14, 4);
+  const count = Math.max(4, Math.floor((width - 16) / 15));
+  for (let i = 0; i < count; i++) {
+    const x = 10 + i * ((width - 22) / Math.max(1, count - 1));
+    const peak = surface - (7 + (i % 3) * 2);
+    const left = Math.round(x);
+    // Borde rojo, llama naranja y núcleo amarillo: forma irregular pixel-art.
+    fillPixelPolygon(ctx, [
+      [left - 5, surface + 1], [left - 4, surface - 3], [left - 2, peak + 3],
+      [left, peak], [left + 2, peak + 4], [left + 4, surface - 4], [left + 6, surface + 1],
+    ], INK);
+    fillPixelPolygon(ctx, [
+      [left - 3, surface], [left - 2, surface - 3], [left, peak + 3],
+      [left + 2, peak + 5], [left + 4, surface - 3], [left + 4, surface],
+    ], "#e34b25");
+    fillPixelPolygon(ctx, [
+      [left - 1, surface], [left, peak + 5], [left + 2, surface - 2], [left + 3, surface],
+    ], "#ffb52e");
+    ctx.fillStyle = "#fff0a3";
+    ctx.fillRect(left, surface - 4, 2, 3);
   }
-  ctx.fillStyle = "#d8fbff";
-  ctx.fillRect(3, surface, width - 6, 2);
 }
 
 function sprite(width: number, paint: (ctx: CanvasRenderingContext2D, width: number) => number, hazard: boolean): Sprite {
   const ctx = make(width, 32, true);
   const surface = paint(ctx, width);
-  if (hazard) paintGlass(ctx, width, surface);
+  if (hazard) paintFire(ctx, width, surface);
   const canvas = ctx.canvas;
   return { canvas, left: flip(canvas), surface };
 }
@@ -485,31 +508,78 @@ function paintAwning(ctx: CanvasRenderingContext2D, w: number) {
 }
 
 function paintPlane(ctx: CanvasRenderingContext2D, w: number) {
-  ctx.fillStyle = INK;
-  ctx.fillRect(2, 3, 14, 16);
-  ctx.fillStyle = WHITE;
-  ctx.fillRect(4, 4, 10, 13);
-  ctx.fillStyle = CELESTE;
-  ctx.fillRect(4, 7, 10, 2);
-  ctx.fillRect(4, 11, 10, 2);
-  ctx.fillStyle = INK;
-  ctx.fillRect(8, 14, w - 12, 10);
-  ctx.fillStyle = WHITE;
-  ctx.fillRect(10, 15, w - 16, 8);
-  ctx.fillStyle = CELESTE;
-  ctx.fillRect(12, 19, w - 24, 2);
+  // Avión de pasajeros de perfil: cola, alas en perspectiva, fuselaje afinado y ventanas.
+  // La silueta tiene diagonales para que no parezca una plataforma rectangular.
+  fillPixelPolygon(ctx, [
+    [12, 15], [20, 5], [27, 4], [24, 15], [32, 18], [24, 21], [12, 19],
+  ], INK);
+  fillPixelPolygon(ctx, [
+    [14, 15], [21, 7], [25, 6], [23, 15], [29, 18], [23, 19], [14, 18],
+  ], RED);
+
+  // Ala principal, elevada detrás del cuerpo.
+  fillPixelPolygon(ctx, [
+    [39, 15], [55, 3], [72, 3], [61, 15], [79, 23], [72, 27], [48, 19],
+  ], INK);
+  fillPixelPolygon(ctx, [
+    [43, 14], [56, 6], [67, 5], [59, 15], [73, 22], [69, 24], [49, 18],
+  ], STEEL);
+  fillPixelPolygon(ctx, [
+    [49, 15], [60, 9], [66, 8], [59, 16], [70, 22], [65, 21], [52, 17],
+  ], CELESTE2);
+
+  // Ala trasera inferior.
+  fillPixelPolygon(ctx, [
+    [17, 17], [29, 19], [40, 28], [32, 29], [17, 22],
+  ], INK);
+  fillPixelPolygon(ctx, [
+    [19, 18], [29, 20], [36, 26], [32, 26], [19, 21],
+  ], SLATE);
+
+  // Fuselaje blanco con morro redondeado y cola más estrecha.
+  fillPixelPolygon(ctx, [
+    [3, 15], [10, 12], [w - 19, 12], [w - 11, 14], [w - 4, 17],
+    [w - 12, 20], [w - 23, 22], [11, 21], [4, 19],
+  ], INK);
+  fillPixelPolygon(ctx, [
+    [7, 15], [12, 14], [w - 19, 14], [w - 9, 17], [w - 22, 19],
+    [12, 19], [7, 18],
+  ], WHITE);
+
+  // Franja celeste y ventanas pequeñas.
   ctx.fillStyle = CELESTE2;
-  for (let x = 20; x < w - 24; x += 8) ctx.fillRect(x, 16, 4, 3);
+  ctx.fillRect(17, 18, w - 43, 2);
   ctx.fillStyle = CELESTE;
-  ctx.fillRect(w - 22, 16, 6, 4);
+  for (let x = 31; x < w - 25; x += 8) ctx.fillRect(x, 15, 4, 3);
+  ctx.fillStyle = INK;
+  ctx.fillRect(w - 24, 15, 5, 3);
+  ctx.fillRect(w - 18, 15, 4, 3);
+
+  // Cabina de mando y reflejo del parabrisas.
+  fillPixelPolygon(ctx, [
+    [w - 22, 13], [w - 15, 13], [w - 8, 16], [w - 22, 16],
+  ], CELESTE2);
+  ctx.fillStyle = WHITE;
+  ctx.fillRect(w - 18, 14, 4, 1);
+
+  // Motores redondos bajo el ala.
+  ctx.fillStyle = INK;
+  ctx.beginPath();
+  ctx.ellipse(Math.round(w * 0.56), 22, 6, 3, 0, 0, Math.PI * 2);
+  ctx.ellipse(Math.round(w * 0.78), 21, 5, 3, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = STEEL;
+  ctx.fillRect(Math.round(w * 0.56) - 3, 21, 5, 2);
+  ctx.fillRect(Math.round(w * 0.78) - 2, 20, 4, 2);
+
+  // Un pequeño tren de aterrizaje bajo la panza.
+  ctx.fillStyle = INK;
+  ctx.fillRect(26, 21, 2, 4);
+  ctx.fillRect(w - 30, 20, 2, 5);
   ctx.fillStyle = SLATE;
-  const wing = (w * 0.34) | 0;
-  ctx.fillRect(wing, 22, (w * 0.36) | 0, 4);
-  ctx.fillStyle = INK;
-  ctx.fillRect(wing, 26, (w * 0.36) | 0, 2);
-  ctx.fillStyle = INK;
-  ctx.fillRect(w - 8, 17, 6, 4);
-  return 15;
+  ctx.fillRect(24, 24, 6, 2);
+  ctx.fillRect(w - 32, 24, 6, 2);
+  return 12;
 }
 
 const PAINTERS: Record<SkyPlatformKind, (ctx: CanvasRenderingContext2D, width: number) => number> = {
