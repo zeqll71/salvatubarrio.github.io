@@ -129,9 +129,19 @@ export function extendSkyWorld(world: SkyWorld, highestHeight: number): void {
     const choices = PLATFORM_WIDTHS[kind];
     const width = choices[Math.floor(random01(world) * choices.length)]!;
     const x = placeX(previous.x, previous.width, width, index);
-    // El fuego aparece únicamente en algunos aviones y nunca en dos plataformas seguidas.
-    const hazard = kind === "airplane" && !previous.hazard && index > 3 && random01(world) < 0.34;
-    const vx = kind === "airplane" ? (random01(world) < 0.5 ? -1 : 1) * (24 + random01(world) * 25) : 0;
+        // El fuego aparece únicamente en algunos aviones.
+    // Cada plataforma con fuego garantiza un Sol de Mayo antes de aterrizar.
+    const hazard =
+      kind === "airplane" &&
+      !previous.hazard &&
+      index > 3 &&
+      random01(world) < 0.34;
+
+    const vx =
+      kind === "airplane"
+        ? (random01(world) < 0.5 ? -1 : 1) * (24 + random01(world) * 25)
+        : 0;
+
     const platform: SkyPlatform = {
       id: world.nextId++,
       x,
@@ -141,9 +151,19 @@ export function extendSkyWorld(world: SkyWorld, highestHeight: number): void {
       hazard,
       vx,
     };
+
     world.platforms.push(platform);
-    // Menos coleccionables para que la subida exija elegir mejor el recorrido.
-    if (index % 6 === 3 || random01(world) < 0.08) {
+
+    if (hazard) {
+      // Escudo garantizado para poder superar el avión en llamas.
+      world.pickups.push({
+        id: world.nextId++,
+        x: x + width / 2,
+        height: height + 30,
+        kind: "sun",
+        collected: false,
+      });
+    } else if (index % 6 === 3 || random01(world) < 0.08) {
       world.pickups.push({
         id: world.nextId++,
         x: Math.max(14, Math.min(306, x + width / 2 + (random01(world) - 0.5) * 20)),
@@ -152,6 +172,7 @@ export function extendSkyWorld(world: SkyWorld, highestHeight: number): void {
         collected: false,
       });
     }
+
     previous = platform;
     world.nextHeight = height;
   }
