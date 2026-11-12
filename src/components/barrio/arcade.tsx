@@ -272,17 +272,23 @@ export function ArcadeScreen({
         updateMovingPlatforms(game.world, dt);
 
         const keyboard = (keyRightRef.current ? 1 : 0) - (keyLeftRef.current ? 1 : 0);
+
         if (keyboard !== 0) {
-          p.vx += keyboard * 1450 * dt;
+          p.vx += keyboard * 1900 * dt;
           targetXRef.current = null;
         } else if (targetXRef.current !== null) {
           const delta = targetXRef.current - p.x;
-          p.vx += (Math.max(-1500, Math.min(1500, delta * 16)) - p.vx * 7.5) * dt;
+          const desiredVx = Math.max(-620, Math.min(620, delta * 24));
+
+          // Respuesta más rápida al movimiento del dedo, sin perder suavidad.
+          p.vx += (desiredVx - p.vx) * Math.min(1, dt * 22);
         } else {
           p.vx *= Math.pow(0.045, dt);
         }
-        p.vx = Math.max(-335, Math.min(335, p.vx));
+
+        p.vx = Math.max(-620, Math.min(620, p.vx));
         p.x += p.vx * dt;
+
         if (p.x < -PLAYER_W / 2) p.x = W + PLAYER_W / 2;
         if (p.x > W + PLAYER_W / 2) p.x = -PLAYER_W / 2;
 
@@ -515,8 +521,8 @@ export function ArcadeScreen({
           <div className="dialog sky-help-dialog">
             <p className="kicker">SKY JUMP</p>
             <h2>Cómo se juega</h2>
-            <p>Hijitus rebota solo. Movelo con ← → o A / D; en celular, deslizá el dedo; en PC, mové el mouse. Puede salir por un costado y entrar por el otro.</p>
-            <p>Vereda, techo, taxi, colectivo, balcón y avión se pisan. Algunos aviones tienen fuego: el Sol de Mayo te protege una vez. El globo impulsa.</p>
+            <p>El personaje rebota solo. Movelo con ← → o A / D; en celular, deslizá el dedo; en PC, mové el mouse. Puede salir por un costado y entrar por el otro.</p>
+            <p>Vereda, techo, taxi, colectivo, balcón y avión se pisan. Algunos aviones tienen fuego: el Sol de Mayo te protege una vez. Y el globo impulsa.</p>
             <p>La inundación sube. El cielo cambia con los puntos: calle, techos, cielo y espacio.</p>
             <button className="tap" type="button" onClick={() => { setHelp(false); setPauseMenu(true); }}>Volver a la pausa</button>
           </div>
